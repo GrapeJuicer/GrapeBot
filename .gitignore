@@ -1,5 +1,6 @@
 # file
 token.txt
+*.pyc
 
 # directory
 practice/
