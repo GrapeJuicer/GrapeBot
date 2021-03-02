@@ -5,7 +5,7 @@ intents: dc.Intents = dc.Intents.default()
 client: dc.Client = dc.Client(intents=intents)
 
 
-# Botを呼び出すときのコマンド
+# call command
 gbauth = [
     "!gb",
     "!grape",
@@ -23,18 +23,41 @@ async def on_ready():
 
 @client.event
 async def on_message(message: dc.Message):
-    # メッセージの送信者が本Botだった場合は何もしない
+    # do not anything if sender is this bot
     if message.author == client.user:
         return
 
+    # convert a space-separated string to a list
     msgs = message.content.split(" ")
+    # remove empty string in message list
+    msgs = [i for i in msgs if i != ""]
 
+    # if message uses command that calls this bot
     if msgs[0] in gbauth:
         try:
-            await message.channel.send("{0} is Not found. func test > {1}".format(msgs[1], vc.test()))
+            # message processing func
+            await messageProcess(msgs, message.channel)
         except:
-            # help に移行
-            await message.channel.send("Invalid Usage.\nPlease enter '{0} help'".format(msgs[0]))
+            # error
+            # print("error !")
+            await sendErr(msgs, message.channel)
+
+
+# message processing
+async def messageProcess(messages: list, channel: dc.TextChannel):
+    if (messages[1] == "test"):  # test -------------------------
+        await channel.send(vc.test())
+    else:
+        # print("non match !")
+        raise Exception("NonMatchError")
+
+
+# send error message to discord
+async def sendErr(messages: list, channel: dc.TextChannel):
+    str = "Invalid Usage.\n"
+    str += "'" + " ".join(messages) + "' is not exist.\n"
+    str += "Please enter '{0} help'.".format(messages[0])
+    await channel.send(str)
 
 
 # main
