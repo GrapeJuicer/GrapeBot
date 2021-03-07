@@ -61,5 +61,5 @@ async def sendErr(messages: list, channel: dc.TextChannel):
 
 
 # main
-f = open("../token.txt")
+f = open("token.txt")
 client.run(f.read())
