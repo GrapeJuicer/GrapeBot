@@ -1,7 +1,7 @@
 import discord as dc
 import vcstatus.vcstatus as vc
 
-intents: dc.Intents = dc.Intents.default()
+intents: dc.Intents = dc.Intents.all()
 client: dc.Client = dc.Client(intents=intents)
 
 
@@ -24,7 +24,7 @@ async def on_ready():
 @client.event
 async def on_message(message: dc.Message):
     # do not anything if sender is this bot
-    if message.author == client.user:
+    if message.author == client.user or message.content == "":
         return
 
     # convert a space-separated string to a list
