@@ -1,6 +1,5 @@
 import discord as dc
 
-
 def getActiveVc(guild: dc.Guild):
     chs = [i for i in guild.channels if type(i) == dc.VoiceChannel]
 
