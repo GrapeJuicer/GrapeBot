@@ -44,8 +44,8 @@ async def on_message(message: dc.Message):
 
 # message processing
 async def messageProcess(messages: list, channel: dc.TextChannel):
-    if (messages[1] == "test"):  # test -------------------------
-        await channel.send(vc.test())
+    if (messages[1] == "vclist"):  # voice channel list -------------------------
+        await vc.sendVcStatus(channel)
     else:
         raise Exception("NonMatchException")
 
