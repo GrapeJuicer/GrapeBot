@@ -39,7 +39,6 @@ async def on_message(message: dc.Message):
             await messageProcess(msgs, message.channel)
         except:
             # error
-            # print("error !")
             await sendErr(msgs, message.channel)
 
 
@@ -48,8 +47,7 @@ async def messageProcess(messages: list, channel: dc.TextChannel):
     if (messages[1] == "test"):  # test -------------------------
         await channel.send(vc.test())
     else:
-        # print("non match !")
-        raise Exception("NonMatchError")
+        raise Exception("NonMatchException")
 
 
 # send error message to discord
