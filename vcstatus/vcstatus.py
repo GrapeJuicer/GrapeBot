@@ -32,7 +32,7 @@ def getVcInfo(channel: dc.VoiceChannel):
 
 
 async def sendVcStatus(channel: dc.TextChannel):
-    embed: dc.Embed = dc.Embed(title="Voice Channel Status")
+    embed: dc.Embed = dc.Embed(title="Voice Channel Status", color=0xa652bb)
     vclist = getActiveVc(channel.guild)
     i = 97;
     for ch in vclist:
