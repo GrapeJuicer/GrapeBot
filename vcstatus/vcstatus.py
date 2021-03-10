@@ -1,11 +1,13 @@
 import discord as dc
 
 def getActiveVc(guild: dc.Guild):
+    # ボイスチャンネルの取得
     chs = [i for i in guild.channels if type(i) == dc.VoiceChannel]
 
     # for i in chs:
     #     getVcInfo(i)
 
+    # アクティブなボイスチャンネルを抽出
     active_chs = [i for i in chs if len(i.members) > 0]
     return active_chs
 
