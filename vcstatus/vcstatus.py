@@ -9,6 +9,10 @@ def getActiveVc(guild: dc.Guild):
 
     # アクティブなボイスチャンネルを抽出
     active_chs = [i for i in chs if len(i.members) > 0]
+
+    # Discordでの表示順に並び替え
+    active_chs = sorted(active_chs, key=lambda f: f.position)
+
     return active_chs
 
 
