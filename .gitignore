@@ -1,6 +1,7 @@
 # file
 token.txt
-*.pyc
+*.db
+*.db-journal
 
 # directory
 practice/
