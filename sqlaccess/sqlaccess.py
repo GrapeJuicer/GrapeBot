@@ -1,5 +1,4 @@
 import sqlite3
-import os
 
 class SqliteAccessor:
     def __init__(self, file: str):
