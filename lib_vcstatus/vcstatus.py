@@ -110,14 +110,44 @@ def getVcInfo(channel: dc.VoiceChannel) -> None:
     print("メンバー数    : {0}".format(len(channel.members)))
 
 
-async def sendVcStatus(channel: dc.TextChannel):
-    embed: dc.Embed = dc.Embed(title="Voice Channel Status", color=0xa652bb)
-    vclist = getActiveVc(channel.guild)
-    i = 97;
-    for ch in vclist:
-        if i > 122:  # chr(122) = 'z'
-            embed.add_field(name="etc...", inline=False)
+# return embed as following field type: "channel.name [category.name]"
+def getVcStatusEmbed(guild: dc.Guild) -> ResizableEmbed:
+    # get active voice channel list
+    vclist = getActiveVc(guild)
+    # get active voice num
+    num = len(vclist)
+    # get embed obect with title message
+    embed: ResizableEmbed = ResizableEmbed(min(num, 26), title="Voice Channel Status", color=0xa652bb)
+    # voice channel is exist
+    if num > 0:
+        for i, ch in enumerate(vclist):
+            if i > 25:  # after than 'z'
+                embed.add_field(name="etc...", value="Too many active VC !", inline=False)
             break
+            # set channel name
+            name = alphaEmojis[i] + " " + ch.name
+            # set category name if channel's category is exist
+            if ch.category != None:
+                name += " [%s]" % ch.category.name
+            # convert id from int to numcom
+            ncid = numcom(ch.id)
+            # set channelid
+            name += " (%s)" % ncid
+            # set embed's user list header
+            lh = "---- "
+            # get voice channel members as string
+            val = getVcMembersAsString(ch, head=lh, div="\n" + lh)
+            # add field
+            embed.add_field(name=name, value=val, inline=False)
+            # increment
+            i += 1
+    # not exist
+    else:
+        embed.add_field(name="None", value="---- No VC is active.", inline=False)
+    # return embed object
+    return embed
+
+
 async def addStatusReaction(message: dc.Message, num: int) -> None:
     # check value
     if num > 26:
