@@ -214,3 +214,28 @@ async def updateVcStatus(guild: dc.Guild, accr: SqliteAccessor, table: str) -> N
         await updateVcStatusMessage(msg, accr, table)
 
 
+async def getVcInvite(message: dc.Message, reaction: Union[dc.Emoji, str]) -> dc.Invite:
+    # get index of embed
+    index: int = alphaEmojis.index(str(reaction))
+    # get embed
+    embed: dc.Embed = message.embeds[0]
+    id: int = getChannelIdFromEmbed(embed, index)
+    guild: dc.Guild = message.guild
+    # get channel
+    channel = guild.get_channel(id)
+    # check type
+    if type(channel) is not dc.VoiceChannel:
+        raise Exception("TypeError")
+    # return
+    return await createVcInvite(channel)
+
+
+async def createVcInvite(channel: dc.VoiceChannel) -> dc.Invite:
+    return await channel.create_invite(max_age=60, max_uses=1, unique=True)
+
+
+def getChannelIdFromEmbed(embed: dc.Embed, index: int) -> int:
+    field: dc.embeds.EmbedProxy = embed.fields[index]
+    i: int = field.name.rindex("(")
+    j: int = field.name.rindex(")")
+    return int(numcom(field.name[i+1:j]))
