@@ -9,9 +9,17 @@ from sqlaccess.sqlaccess import SqliteAccessor
 import lib_vcstatus.vcstatus as vc
 
 
+vsDbName = "vcstatus.db"
+vsTableName = "vcstatus"
+
 
 intents: dc.Intents = dc.Intents.all()
 client: dc.Client = dc.Client(intents=intents)
+
+# get database file path
+filepath = os.path.dirname(__file__) + os.sep + vsDbName
+# connect database
+vcdata = SqliteAccessor(filepath)
 
 
 # call command
