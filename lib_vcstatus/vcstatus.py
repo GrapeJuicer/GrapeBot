@@ -19,7 +19,7 @@ from sqlaccess.sqlaccess import SqliteAccessor
 from typing import Union
 from NumCompression.numcom import numcom
 
-def getActiveVc(guild: dc.Guild):
+def getActiveVc(guild: dc.Guild) -> list:
     # ボイスチャンネルの取得
     chs = [i for i in guild.channels if type(i) == dc.VoiceChannel]
 
@@ -47,7 +47,7 @@ def getVcMembersAsString(channel: dc.VoiceChannel, head="", end="", div=" ") -> 
     return s[:-len(div)] + end  # 最後の1文字以外を返す
 
 
-def getVcInfo(channel: dc.VoiceChannel):
+def getVcInfo(channel: dc.VoiceChannel) -> None:
     print("--------------------------------")
     print("作成日時      : {0}".format(str(channel.created_at)))
     print("ビットレート  : {0}".format(channel.bitrate))
