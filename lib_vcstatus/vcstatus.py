@@ -43,6 +43,13 @@ def dict2list(di: dict) -> list:
 """
 
 
+# messageid ... integer or list of integer
+def addVcStatusMessageId(message: dc.Message, accr: SqliteAccessor, table: str):
+    # add item
+    sql = "insert into {0} (guildid, channelid, msgid) values (?,?,?)".format(table)
+    accr.execute(sql, [message.guild.id, message.channel.id, message.id])
+
+
 def getActiveVc(guild: dc.Guild) -> list:
     # ボイスチャンネルの取得
     chs = [i for i in guild.channels if type(i) == dc.VoiceChannel]
