@@ -21,6 +21,9 @@ filepath = os.path.dirname(__file__) + os.sep + vsDbName
 # connect database
 vcdata = SqliteAccessor(filepath)
 
+# multi-process var
+activeProcessFlag: multiprocessing.Value
+flagMP = False
 
 # call command
 gbauth = [
