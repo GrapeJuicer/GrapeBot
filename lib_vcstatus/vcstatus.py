@@ -6,7 +6,18 @@ TODO
 - メッセージ削除時に "VC Status" メッセージであれば DB から削除する
 - チャンネル名＋カテゴリ名からチャンネルオブジェクトを取得できないので，メッセージにIDを記載する
 """
+
+from enum import unique
+import sys
+
+# sys.path.append("..")  # .../discordbot/vcstatus で実行されたとき
+sys.path.append(".")  # .../discordbot で実行されたとき
+
 import discord as dc
+import sqlite3
+from sqlaccess.sqlaccess import SqliteAccessor
+from typing import Union
+from NumCompression.numcom import numcom
 
 def getActiveVc(guild: dc.Guild):
     # ボイスチャンネルの取得
