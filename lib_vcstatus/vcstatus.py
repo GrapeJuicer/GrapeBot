@@ -43,6 +43,26 @@ def dict2list(di: dict) -> list:
 """
 
 
+class ResizableEmbed(dc.Embed):
+    def __init__(self, size: int, **kwargs):
+        kwargs["title"] = kwargs.get('title', dc.embeds.EmptyEmbed) + " [{0}]".format(size if size <= 26 else "26+")
+        super().__init__(**kwargs)
+        self.size = size
+    
+    # return number of active VC. if value is larger than 
+    @staticmethod
+    def getSizeFromEmbed(embed :dc.Embed):
+        if not type(embed.title) is str:
+            return
+        t: str = embed.title
+        ifrom = t.rindex("[")
+        ito = t.rindex("]")
+        sval = t[ifrom+1:ito]
+        if sval[-1] == "+":
+            sval = sval[:-1]
+        return int(sval)
+
+
 # messageid ... integer or list of integer
 def addVcStatusMessageId(message: dc.Message, accr: SqliteAccessor, table: str):
     # add item
