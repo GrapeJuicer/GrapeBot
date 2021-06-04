@@ -1,5 +1,14 @@
+import multiprocessing
+import sys
+# sys.path.append("..")  # .../discordbot/vcstatus で実行されたとき
+sys.path.append(".")  # .../discordbot で実行されたとき
+
+import os
 import discord as dc
-import vcstatus.vcstatus as vc
+from sqlaccess.sqlaccess import SqliteAccessor
+import lib_vcstatus.vcstatus as vc
+
+
 
 intents: dc.Intents = dc.Intents.all()
 client: dc.Client = dc.Client(intents=intents)
