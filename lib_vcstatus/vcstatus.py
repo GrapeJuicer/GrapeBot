@@ -203,3 +203,14 @@ async def updateStatusReaction(message: dc.Message, osize: int, nsize: int) -> N
             await message.clear_reaction(alphaEmojis[i])
 
 
+async def updateVcStatus(guild: dc.Guild, accr: SqliteAccessor, table: str) -> None:
+    # execute
+    sql = "select channelid, msgid from {0} where guildid = {1}".format(table, guild.id)
+    accr.execute(sql)
+    
+    for row in accr.fetchall():
+        # row ... [channelid, msgid]
+        msg: dc.Message = await guild.get_channel(row[0]).fetch_message(row[1])
+        await updateVcStatusMessage(msg, accr, table)
+
+
