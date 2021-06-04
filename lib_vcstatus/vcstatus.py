@@ -93,7 +93,7 @@ def getVcMembersAsString(channel: dc.VoiceChannel, head="", end="", div=" ") -> 
         if m.nick == None:
             s += str(m.name) + div
         else:
-        s += str(m.nick) + div
+            s += str(m.nick) + div
 
     return s[:-len(div)] + end  # 最後の1文字以外を返す
 
@@ -123,7 +123,7 @@ def getVcStatusEmbed(guild: dc.Guild) -> ResizableEmbed:
         for i, ch in enumerate(vclist):
             if i > 25:  # after than 'z'
                 embed.add_field(name="etc...", value="Too many active VC !", inline=False)
-            break
+                break
             # set channel name
             name = alphaEmojis[i] + " " + ch.name
             # set category name if channel's category is exist
