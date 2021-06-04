@@ -35,6 +35,12 @@ gbauth = [
 
 @client.event
 async def on_ready():
+    # set flag or disp messsage
+    if flagMP:
+        activeProcessFlag.value = 2
+    else:
+        print("'vcstatus' module ready. (user: {0}, id: {1})".format(client.user.name, client.user.id))
+    
     # update
     for guild in client.guilds:
         await vc.updateVcStatus(guild, vcdata, vsTableName)
@@ -128,6 +134,14 @@ async def sendErr(message: dc.Message):
 
 
 def launch_vcstatus(token: str, activeFlag: multiprocessing.Value = None):
+    # set flag
+    if not activeFlag == None:
+        global activeProcessFlag
+        global flagMP
+        activeProcessFlag = activeFlag
+        activeProcessFlag.value = 1 # launch
+        flagMP = True
+    
     # execute command - create table
     vcdata.execute("create table if not exists {0}(guildid, channelid, msgid)".format(vsTableName))
     # run
@@ -135,6 +149,10 @@ def launch_vcstatus(token: str, activeFlag: multiprocessing.Value = None):
     
     # disconnect database
     vcdata.disconnect()
+
+    # set flag
+    if not activeFlag == None:
+        activeProcessFlag.value = 0
 
 
 # main ---
