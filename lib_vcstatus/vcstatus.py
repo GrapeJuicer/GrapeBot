@@ -35,10 +35,13 @@ def getActiveVc(guild: dc.Guild):
     return active_chs
 
 
-def getVcMembersAsString(channel: dc.VoiceChannel, head="", end="", div=" "):
+def getVcMembersAsString(channel: dc.VoiceChannel, head="", end="", div=" ") -> str:
     s: str = head
 
     for m in channel.members:
+        if m.nick == None:
+            s += str(m.name) + div
+        else:
         s += str(m.nick) + div
 
     return s[:-len(div)] + end  # 最後の1文字以外を返す
