@@ -92,6 +92,29 @@ async def on_voice_state_update(member: dc.Member, before: dc.VoiceState, after:
     await vc.updateVcStatus(member.guild, vcdata, vsTableName)
 
 
+@client.event
+async def on_raw_reaction_add(payload: dc.RawReactionActionEvent):
+    # check reaction type
+    if payload.event_type != "REACTION_ADD" or payload.member == client.user:
+        return
+    # get channel object
+    channel = client.get_channel(payload.channel_id)
+    # check channel type
+    if type(channel) != dc.TextChannel:
+        return
+    # get message objct
+    message: dc.Message = await channel.fetch_message(payload.message_id)
+    # don't do anything if sender is me
+    if not vc.isVcStatusMessage(message, vcdata, vsTableName):
+        return
+    # remove reaction
+    await message.remove_reaction(payload.emoji, payload.member)
+    # create invate
+    inv: dc.Invite = await vc.getVcInvite(message, payload.emoji)
+    # send invite link
+    await payload.member.send("This is your invite link of voice channel:\nURL: %s" % inv.url)
+
+
 # send error message to discord
 async def sendErr(message: dc.Message):
     messages: list = [i for i in message.content.split(" ") if i != ""]
