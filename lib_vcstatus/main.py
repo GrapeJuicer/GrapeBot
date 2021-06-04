@@ -32,10 +32,9 @@ gbauth = [
 
 @client.event
 async def on_ready():
-    print("Logged in as")
-    print("User : ", client.user.name)
-    print("ID   : ", client.user.id)
-    print("------")
+    # update
+    for guild in client.guilds:
+        await vc.updateVcStatus(guild, vcdata, vsTableName)
 
 
 @client.event
