@@ -148,6 +148,32 @@ def getVcStatusEmbed(guild: dc.Guild) -> ResizableEmbed:
     return embed
 
 
+# table : vcstatus (guildid, msgid)
+def isVcStatusMessage(message: dc.Message, accr: SqliteAccessor, table: str) -> bool:
+    sql = "select guildid, channelid, msgid from {0} where guildid = {1} and channelid = {2} and msgid = {3}"\
+                    .format(table, message.guild.id, message.channel.id, message.id)
+    # execute sql command
+    accr.execute(sql)
+    # return
+    return len(accr.fetchall()) > 0  # exist...True, none...False
+
+
+async def updateVcStatusMessage(message: dc.Message, accr: SqliteAccessor, table: str)-> None:
+    # check message
+    if not isVcStatusMessage(message, accr, table):
+        return
+    # get old embed
+    oldembed: dc.Embed = message.embeds[0]
+    # get size if old embed
+    osize = ResizableEmbed.getSizeFromEmbed(oldembed)
+    # create embed of voice chat status
+    embed: ResizableEmbed = getVcStatusEmbed(message.guild)
+    # edit message
+    await message.edit(embed=embed)
+    # update reaction
+    await updateStatusReaction(message, osize, embed.size)
+
+
 async def addStatusReaction(message: dc.Message, num: int) -> None:
     # check value
     if num > 26:
