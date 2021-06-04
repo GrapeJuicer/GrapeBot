@@ -148,6 +148,17 @@ def getVcStatusEmbed(guild: dc.Guild) -> ResizableEmbed:
     return embed
 
 
+async def sendVcStatus(channel: dc.TextChannel) -> dc.Message:
+    # get voice channel status of the guild
+    embed: ResizableEmbed = getVcStatusEmbed(channel.guild)
+    # send message and get message object
+    msg = await channel.send(embed=embed)
+    # add reaction
+    await addStatusReaction(msg, embed.size)
+    # return message's object
+    return msg
+
+
 # table : vcstatus (guildid, msgid)
 def isVcStatusMessage(message: dc.Message, accr: SqliteAccessor, table: str) -> bool:
     sql = "select guildid, channelid, msgid from {0} where guildid = {1} and channelid = {2} and msgid = {3}"\
