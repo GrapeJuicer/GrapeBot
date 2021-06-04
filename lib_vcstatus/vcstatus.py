@@ -19,6 +19,26 @@ from sqlaccess.sqlaccess import SqliteAccessor
 from typing import Union
 from NumCompression.numcom import numcom
 
+"""
+def list2dict(li: list) ->dict:
+    di = {}
+    for l in li:
+        if not l[0] in di:
+            di[l[0]] = [l[1]]
+        elif not l[1] in di[l[0]]:
+            di[l[0]].append(l[1])
+    return di
+
+
+def dict2list(di: dict) -> list:
+    li = []
+    for k, v in di.items():
+        for vi in v:
+            li.append([k, vi])
+    return li
+"""
+
+
 def getActiveVc(guild: dc.Guild) -> list:
     # ボイスチャンネルの取得
     chs = [i for i in guild.channels if type(i) == dc.VoiceChannel]
