@@ -87,6 +87,11 @@ async def messageProcess(message: dc.Message):
         raise Exception("NonMatchException")
 
 
+@client.event
+async def on_voice_state_update(member: dc.Member, before: dc.VoiceState, after: dc.VoiceState):
+    await vc.updateVcStatus(member.guild, vcdata, vsTableName)
+
+
 # send error message to discord
 async def sendErr(message: dc.Message):
     messages: list = [i for i in message.content.split(" ") if i != ""]
