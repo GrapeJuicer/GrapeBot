@@ -124,6 +124,17 @@ async def sendErr(message: dc.Message):
     await message.channel.send(str)
 
 
-# main
-f = open("token.txt")
-client.run(f.read())
+def launch_vcstatus(token: str, activeFlag: multiprocessing.Value = None):
+    # execute command - create table
+    vcdata.execute("create table if not exists {0}(guildid, channelid, msgid)".format(vsTableName))
+    # run
+    client.run(token)
+    
+    # disconnect database
+    vcdata.disconnect()
+
+
+# main ---
+if __name__ == "__main__":
+    with open("token.txt") as f:
+        launch_vcstatus(f.read())
