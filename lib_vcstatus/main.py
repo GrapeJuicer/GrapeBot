@@ -56,6 +56,7 @@ async def on_message(message: dc.Message):
         msg = message.content
         callcmd = msg[:msg.index(" ")]
     except ValueError:
+        await sendErr(message)
         return
 
     # if message uses command that calls this bot
@@ -73,7 +74,7 @@ async def messageProcess(message: dc.Message):
     # convert a space-separated string to a list
     messages: list = [i for i in message.content.split(" ") if i != ""]
     # check
-    if (messages[1] == "vclist"):  # voice channel list
+    if messages[1] == "vclist": # voice channel list
         # send message and get sended message object
         msg = await vc.sendVcStatus(message.channel)
         # add message id to database
