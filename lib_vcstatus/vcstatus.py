@@ -64,9 +64,21 @@ async def sendVcStatus(channel: dc.TextChannel):
         if i > 122:  # chr(122) = 'z'
             embed.add_field(name="etc...", inline=False)
             break
+async def addStatusReaction(message: dc.Message, num: int) -> None:
+    # check value
+    if num > 26:
+        raise Exception("ValueError")
+    # add reaction
+    for i in range(0, num):
+        await message.add_reaction(alphaEmojis[i])
 
-        name = ":regional_indicator_" + chr(i) + ": " + ch.name
-        embed.add_field(name=name, value=getVcMembersAsString(ch, head=" ---- ", div="\n ---- "), inline=False)
-        i += 1
 
-    await channel.send(embed=embed)
+async def updateStatusReaction(message: dc.Message, osize: int, nsize: int) -> None:
+    if osize < nsize:
+        for i in range(osize, nsize):
+            await message.add_reaction(alphaEmojis[i])
+    elif osize > nsize:
+        for i in range(nsize, osize):
+            await message.clear_reaction(alphaEmojis[i])
+
+
