@@ -19,6 +19,10 @@ from sqlaccess.sqlaccess import SqliteAccessor
 from typing import Union
 from NumCompression.numcom import numcom
 
+
+alphaEmojis = ("🇦", "🇧", "🇨", "🇩", "🇪", "🇫", "🇬", "🇭", "🇮", "🇯", "🇰", "🇱", "🇲", "🇳", "🇴", "🇵", "🇶", "🇷", "🇸", "🇹", "🇺", "🇻", "🇼", "🇽", "🇾", "🇿")
+
+
 """
 def list2dict(li: list) ->dict:
     di = {}
