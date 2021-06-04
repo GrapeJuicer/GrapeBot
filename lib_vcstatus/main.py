@@ -59,9 +59,29 @@ async def on_message(message: dc.Message):
 
 
 # message processing
-async def messageProcess(messages: list, channel: dc.TextChannel):
-    if (messages[1] == "vclist"):  # voice channel list -------------------------
-        await vc.sendVcStatus(channel)
+async def messageProcess(message: dc.Message):
+    # convert a space-separated string to a list
+    messages: list = [i for i in message.content.split(" ") if i != ""]
+    # check
+    if (messages[1] == "vclist"):  # voice channel list
+        # send message and get sended message object
+        msg = await vc.sendVcStatus(message.channel)
+        # add message id to database
+        vc.addVcStatusMessageId(msg, vcdata, vsTableName)
+    # elif (messages[1] == "join"):
+    #     # check
+    #     if message.author.voice is None:
+    #         await message.channel.send("You should join voice channel !")
+    #         return
+    #     # connect
+    #     await message.author.voice.channel.connect()
+    # elif (messages[1] == "leave"):
+    #     # check
+    #     if message.guild.voice_client is None:
+    #         await message.channel.send("You should join voice channel !")
+    #         return
+    #     # disconnect
+    #     await message.guild.voice_client.disconnect()
     else:
         raise Exception("NonMatchException")
 
