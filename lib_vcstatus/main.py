@@ -68,11 +68,12 @@ async def messageProcess(messages: list, channel: dc.TextChannel):
 
 
 # send error message to discord
-async def sendErr(messages: list, channel: dc.TextChannel):
+async def sendErr(message: dc.Message):
+    messages: list = [i for i in message.content.split(" ") if i != ""]
     str = "Invalid Usage.\n"
     str += "'" + " ".join(messages) + "' is not exist.\n"
     str += "Please enter '{0} help'.".format(messages[0])
-    await channel.send(str)
+    await message.channel.send(str)
 
 
 # main
