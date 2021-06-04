@@ -43,19 +43,20 @@ async def on_message(message: dc.Message):
     if message.author == client.user or message.content == "":
         return
 
-    # convert a space-separated string to a list
-    msgs = message.content.split(" ")
-    # remove empty string in message list
-    msgs = [i for i in msgs if i != ""]
+    try:
+        msg = message.content
+        callcmd = msg[:msg.index(" ")]
+    except ValueError:
+        return
 
     # if message uses command that calls this bot
-    if msgs[0] in gbauth:
+    if callcmd in gbauth:
         try:
             # message processing func
-            await messageProcess(msgs, message.channel)
+            await messageProcess(message)
         except:
             # error
-            await sendErr(msgs, message.channel)
+            await sendErr(message)
 
 
 # message processing
