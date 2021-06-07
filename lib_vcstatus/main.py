@@ -49,16 +49,17 @@ async def on_ready():
 @client.event
 async def on_message(message: dc.Message):
     # do not anything if sender is this bot
-    if message.author == client.user or message.content == "":
+    if message.author == client.user:
+        return
+    
+    msg = message.content
+    idx = msg.find(" ")
+    if idx == -1:
         return
 
-    try:
-        msg = message.content
-        callcmd = msg[:msg.index(" ")]
-    except ValueError:
-        await sendErr(message)
-        return
-
+    # get cmd
+    callcmd = msg[:idx]
+    
     # if message uses command that calls this bot
     if callcmd in gbauth:
         try:
