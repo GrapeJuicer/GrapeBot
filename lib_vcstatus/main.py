@@ -1,9 +1,29 @@
+import multiprocessing
+import sys
+# sys.path.append("..")  # .../discordbot/vcstatus で実行されたとき
+sys.path.append(".")  # .../discordbot で実行されたとき
+
+import os
 import discord as dc
-import vcstatus.vcstatus as vc
+from sqlaccess.sqlaccess import SqliteAccessor
+import lib_vcstatus.vcstatus as vc
+
+
+vsDbName = "vcstatus.db"
+vsTableName = "vcstatus"
+
 
 intents: dc.Intents = dc.Intents.all()
 client: dc.Client = dc.Client(intents=intents)
 
+# get database file path
+filepath = os.path.dirname(__file__) + os.sep + vsDbName
+# connect database
+vcdata = SqliteAccessor(filepath)
+
+# multi-process var
+activeProcessFlag: multiprocessing.Value
+flagMP = False
 
 # call command
 gbauth = [
@@ -15,49 +35,136 @@ gbauth = [
 
 @client.event
 async def on_ready():
-    print("Logged in as")
-    print("User : ", client.user.name)
-    print("ID   : ", client.user.id)
-    print("------")
+    # set flag or disp messsage
+    if flagMP:
+        activeProcessFlag.value = 2
+    else:
+        print("'vcstatus' module ready. (user: {0}, id: {1})".format(client.user.name, client.user.id))
+    
+    # update
+    for guild in client.guilds:
+        await vc.updateVcStatus(guild, vcdata, vsTableName)
 
 
 @client.event
 async def on_message(message: dc.Message):
     # do not anything if sender is this bot
-    if message.author == client.user or message.content == "":
+    if message.author == client.user:
+        return
+    
+    msg = message.content
+    idx = msg.find(" ")
+    if idx == -1:
         return
 
-    # convert a space-separated string to a list
-    msgs = message.content.split(" ")
-    # remove empty string in message list
-    msgs = [i for i in msgs if i != ""]
-
+    # get cmd
+    callcmd = msg[:idx]
+    
     # if message uses command that calls this bot
-    if msgs[0] in gbauth:
+    if callcmd in gbauth:
         try:
             # message processing func
-            await messageProcess(msgs, message.channel)
+            await messageProcess(message)
         except:
             # error
-            await sendErr(msgs, message.channel)
+            await sendErr(message)
 
 
 # message processing
-async def messageProcess(messages: list, channel: dc.TextChannel):
-    if (messages[1] == "vclist"):  # voice channel list -------------------------
-        await vc.sendVcStatus(channel)
+async def messageProcess(message: dc.Message):
+    # convert a space-separated string to a list
+    messages: list = [i for i in message.content.split(" ") if i != ""]
+    # check
+    if messages[1] == "vclist": # voice channel list
+        # send message and get sended message object
+        msg = await vc.sendVcStatus(message.channel)
+        # add message id to database
+        vc.addVcStatusMessageId(msg, vcdata, vsTableName)
+
+    elif messages[1] == "close" and "vcstatus" in messages[2:]:
+        if message.author.permissions_in(message.channel).administrator:
+            await message.channel.send("LOG: 'vcstatus' process was closed")
+            # print("'vcstatus' process was closed")
+            await client.close()
+
+    # elif (messages[1] == "join"):
+    #     # check
+    #     if message.author.voice is None:
+    #         await message.channel.send("You should join voice channel !")
+    #         return
+    #     # connect
+    #     await message.author.voice.channel.connect()
+    # elif (messages[1] == "leave"):
+    #     # check
+    #     if message.guild.voice_client is None:
+    #         await message.channel.send("You should join voice channel !")
+    #         return
+    #     # disconnect
+    #     await message.guild.voice_client.disconnect()
     else:
         raise Exception("NonMatchException")
 
 
+@client.event
+async def on_voice_state_update(member: dc.Member, before: dc.VoiceState, after: dc.VoiceState):
+    await vc.updateVcStatus(member.guild, vcdata, vsTableName)
+
+
+@client.event
+async def on_raw_reaction_add(payload: dc.RawReactionActionEvent):
+    # check reaction type
+    if payload.event_type != "REACTION_ADD" or payload.member == client.user:
+        return
+    # get channel object
+    channel = client.get_channel(payload.channel_id)
+    # check channel type
+    if type(channel) != dc.TextChannel:
+        return
+    # get message objct
+    message: dc.Message = await channel.fetch_message(payload.message_id)
+    # don't do anything if sender is me
+    if not vc.isVcStatusMessage(message, vcdata, vsTableName):
+        return
+    # remove reaction
+    await message.remove_reaction(payload.emoji, payload.member)
+    # create invate
+    inv: dc.Invite = await vc.getVcInvite(message, payload.emoji)
+    # send invite link
+    await payload.member.send("This is your invite link of voice channel:\nURL: %s" % inv.url)
+
+
 # send error message to discord
-async def sendErr(messages: list, channel: dc.TextChannel):
+async def sendErr(message: dc.Message):
+    messages: list = [i for i in message.content.split(" ") if i != ""]
     str = "Invalid Usage.\n"
     str += "'" + " ".join(messages) + "' is not exist.\n"
     str += "Please enter '{0} help'.".format(messages[0])
-    await channel.send(str)
+    await message.channel.send(str)
 
 
-# main
-f = open("token.txt")
-client.run(f.read())
+def launch_vcstatus(token: str, activeFlag: multiprocessing.Value = None):
+    # set flag
+    if not activeFlag == None:
+        global activeProcessFlag
+        global flagMP
+        activeProcessFlag = activeFlag
+        activeProcessFlag.value = 1 # launch
+        flagMP = True
+    
+    # execute command - create table
+    vcdata.execute("create table if not exists {0}(guildid, channelid, msgid)".format(vsTableName))
+    # run
+    client.run(token)
+    
+    # disconnect database
+    vcdata.disconnect()
+
+    # set flag
+    if not activeFlag == None:
+        activeProcessFlag.value = 0
+
+
+# main ---
+if __name__ == "__main__":
+    with open("token.txt") as f:
+        launch_vcstatus(f.read())
