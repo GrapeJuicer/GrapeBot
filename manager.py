@@ -22,7 +22,7 @@ def createProcess(token: str, flag: mp.Value, func) -> mp.Process:
     return mp.Process(target=func, args=(token, flag,))
 
 def infoToFuncName(cls) -> str:
-    return str(cls)[10:str(cls).find(" at ")]
+    return str(cls)[17:str(cls).find(" at ")] # launch_も取り除く
 
 # def cleanup():
 #     print("Cleanup Processes.")
