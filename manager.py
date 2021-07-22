@@ -1,5 +1,6 @@
 import enum
 import multiprocessing as mp
+import threading as th
 import sys
 # import signal
 from time import sleep
@@ -59,33 +60,87 @@ def launchOne(token: str, index: int) -> None:
         prcs[index].start()
 
 
+# main
+if __name__ == "__main__":
     # get token
     with open("token.txt", "r") as f:
         token = f.read()
 
-    while True:
-        if firstFlg:
-            print("Process Status ({0}) ----------------------------".format(time()))
-        else:
-            print("\033[{0}A\rProcess Status ({1}) ----------------------------".format((len(libs) + 1), time()))
-        for i in range(len(prcs)):
-            if isActiveProcess[i].value == 0 or not prcs[i].is_alive():  # プロセス停止中の時`
-                print("\t{0:20}\t{1:50}".format(infoToFuncName(libs[i]), "INACTIVE"))
-                isActiveProcess[i].value = 0
-                # create process instance
-                prcs[i] = createProcess(token, isActiveProcess[i], libs[i])
-                # set daemon - 親プロセスが終了する時に一緒に消える
-                prcs[i].daemon = True
-                # launch process
-                prcs[i].start()
-            elif isActiveProcess[i].value == 1:
-                print("\t{0:20}\t{1:50}".format(infoToFuncName(libs[i]), "LAUNCHING"))
-            elif isActiveProcess[i].value == 2:
-                print("\t{0:20}\t{1:50}".format(infoToFuncName(libs[i]), "ACTIVE"))
-            else:
-                print("\t{0:20}\t{1:50}".format(infoToFuncName(libs[i]), "ERROR (invalid process flag value)"))
-        
-        if firstFlg:
-            firstFlg = False
+    # create list of lib name
+    plist = [infoToFuncName(f) for f in libs]
+    
+    # create thread
+    th_pcheck: th.Thread = th.Thread(target=checkAlive)
+    th_pcheck.daemon = True
 
-        sleep(5)
+    # launch all processes
+    launchAll(token)
+
+    # start thread
+    th_pcheck.start()
+
+    while True:
+        try:
+            buf = input("grapebot.console > ").split()
+        except:
+            print("\nExiting processes...")
+            sys.exit(1)
+
+        if buf[0] == "help":
+            print("Commands:")
+            print("  help                      Display this information.")
+            print("  status [name...]          Display service's status. If no argument is given, all services will be displayed.")
+            print("  launch [name...]          Launch services. If no argument is given, all services will be launched.")
+            print("  stop [name...]            Stop services. If no argument is given, all services will be stopped.")
+            print("  exit                      Exit program.")
+        elif buf[0] == "list":
+            for n in plist:
+                print(n, end="\t")
+            print("")
+        elif buf[0] == "status":
+            if len(buf) == 1:
+                # show all process status
+                for i in range(len(prcs)):
+                    showStatus(i)
+            else:
+                for bf in buf[1:]: # loop by buf
+                    try:
+                        showStatus(plist.index(bf))
+                    except:
+                        print("Error: lib.{0} is not exist.".format(bf))
+        elif buf[0] == "launch":
+            if len(buf) == 1:
+                launchAll(token)
+            else:
+                for bf in buf[1:]:
+                    try:
+                        launchOne(token, plist.index(bf))
+                    except:
+                        print("Error: lib.{0} is not exist.".format(bf))
+        elif buf[0] == "stop":
+            if len(buf) == 1:
+                for i in range(len(prcs)):
+                    if isActiveProcess[i].value != 0:
+                        prcs[i].terminate()
+                        isActiveProcess[i].value == 0
+            else:
+                for bf in buf[1:]:
+                    try:
+                        prcs[plist.index(bf)].terminate()
+                        print("Process {0} has stopped successfully.".format(bf))
+                    except:
+                        print("Error: lib.{0} is not exist.".format(bf))
+                    
+                    # another way
+                    # filtered processes
+                    # fps = list(filter(lambda x: infoToFuncName(x) == bf, prcs))
+                    # if fps: # if list is not empty
+                    #     fps[0].terminate()
+                    #     print("Process {0} has stopped successfully.".format(bf))
+                    # else:
+                    #     print("Error: lib.{0} is not exist.".format(bf))
+        elif buf[0] == "exit":
+            print("Exiting processes...")
+            sys.exit(0)
+        else:
+            print("Error: Unknown command.")
