@@ -2,7 +2,7 @@ import enum
 import multiprocessing as mp
 import sys
 # import signal
-from time import time, sleep
+from time import sleep
 
 from lib_vcstatus.main import launch_vcstatus
 
@@ -24,21 +24,24 @@ def createProcess(token: str, flag: mp.Value, func) -> mp.Process:
 def infoToFuncName(cls) -> str:
     return str(cls)[17:str(cls).find(" at ")] # launch_も取り除く
 
-# def cleanup():
-#     print("Cleanup Processes.")
-#     for p in prcs:
-#         p.terminate()
+def showStatus(index: int):
+    if isActiveProcess[index].value == 0 or not prcs[i].is_alive():  # if the process is stopped
+        print("{0}: {1}".format(infoToFuncName(libs[index]), "Inactive"))
+    elif isActiveProcess[index].value == 1:
+        print("{0}: {1}".format(infoToFuncName(libs[index]), "Launching"))
+    elif isActiveProcess[index].value == 2:
+        print("{0}: {1}".format(infoToFuncName(libs[index]), "Active"))
+    else:
+        print("{0}: {1}".format(infoToFuncName(libs[index]), "Error (invalid process flag value)"))
 
-# def sig_handler(signum, frame) -> None:
-    # cleanup()
-    # sys.exit(1)
 
-# main
-if __name__ == "__main__":
-    # signal.signal(signal.SIGTERM, sig_handler)
-    # signal.signal(signal.SIGINT, sig_handler)
+def checkAlive():
+    while True:
+        for i in range(len(prcs)):
+            if not prcs[i].is_alive():
+                isActiveProcess[i].value = 0
+        sleep(5)
 
-    firstFlg = True
 
 
 def launchAll(token: str) -> None:
