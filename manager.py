@@ -40,6 +40,22 @@ if __name__ == "__main__":
 
     firstFlg = True
 
+
+def launchAll(token: str) -> None:
+    for i in range(len(prcs)):
+        launchOne(token, i)
+
+
+def launchOne(token: str, index: int) -> None:
+    if isActiveProcess[index].value == 0:
+        # create process instance
+        prcs[index] = createProcess(token, isActiveProcess[index], libs[index])
+        # set daemon - Exit with the parent process when it exits
+        prcs[index].daemon = True
+        # launch process
+        prcs[index].start()
+
+
     # get token
     with open("token.txt", "r") as f:
         token = f.read()
