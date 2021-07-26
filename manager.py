@@ -6,6 +6,7 @@ import sys
 from time import sleep
 
 from lib_vcstatus.main import launch_vcstatus
+import processflag.pflag as pf
 
 # set process launchers
 libs = [
@@ -26,11 +27,11 @@ def infoToFuncName(cls) -> str:
     return str(cls)[17:str(cls).find(" at ")] # launch_も取り除く
 
 def showStatus(index: int):
-    if isActiveProcess[index].value == 0 or not prcs[i].is_alive():  # if the process is stopped
+    if isActiveProcess[index].value == pf.INACTIVE or not prcs[i].is_alive():  # if the process is stopped
         print("{0}: {1}".format(infoToFuncName(libs[index]), "Inactive"))
-    elif isActiveProcess[index].value == 1:
+    elif isActiveProcess[index].value == pf.LAUNCHING:
         print("{0}: {1}".format(infoToFuncName(libs[index]), "Launching"))
-    elif isActiveProcess[index].value == 2:
+    elif isActiveProcess[index].value == pf.ACTIVE:
         print("{0}: {1}".format(infoToFuncName(libs[index]), "Active"))
     else:
         print("{0}: {1}".format(infoToFuncName(libs[index]), "Error (invalid process flag value)"))
