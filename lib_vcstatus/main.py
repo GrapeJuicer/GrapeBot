@@ -1,12 +1,14 @@
 import multiprocessing
 import sys
-# sys.path.append("..")  # .../discordbot/vcstatus で実行されたとき
+
+sys.path.append("..")  # .../discordbot/vcstatus で実行されたとき
 sys.path.append(".")  # .../discordbot で実行されたとき
 
 import os
 import discord as dc
 from sqlaccess.sqlaccess import SqliteAccessor
 import lib_vcstatus.vcstatus as vc
+import processflag.pflag as pf
 
 
 vsDbName = "vcstatus.db"
@@ -17,7 +19,7 @@ intents: dc.Intents = dc.Intents.all()
 client: dc.Client = dc.Client(intents=intents)
 
 # get database file path
-filepath = os.path.dirname(__file__) + os.sep + vsDbName
+filepath = os.path.abspath(os.path.dirname(__file__)) + os.sep + vsDbName
 # connect database
 vcdata = SqliteAccessor(filepath)
 
@@ -37,7 +39,7 @@ gbauth = [
 async def on_ready():
     # set flag or disp messsage
     if flagMP:
-        activeProcessFlag.value = 2
+        activeProcessFlag.value = pf.ACTIVE
     else:
         print("'vcstatus' module ready. (user: {0}, id: {1})".format(client.user.name, client.user.id))
     
@@ -148,7 +150,7 @@ def launch_vcstatus(token: str, activeFlag: multiprocessing.Value = None):
         global activeProcessFlag
         global flagMP
         activeProcessFlag = activeFlag
-        activeProcessFlag.value = 1 # launch
+        activeProcessFlag.value = pf.LAUNCHING
         flagMP = True
     
     # execute command - create table
@@ -161,10 +163,10 @@ def launch_vcstatus(token: str, activeFlag: multiprocessing.Value = None):
 
     # set flag
     if not activeFlag == None:
-        activeProcessFlag.value = 0
+        activeProcessFlag.value = pf.INACTIVE
 
 
 # main ---
 if __name__ == "__main__":
-    with open("token.txt") as f:
+    with open("../token.txt") as f:
         launch_vcstatus(f.read())
