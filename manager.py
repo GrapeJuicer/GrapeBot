@@ -104,6 +104,7 @@ if __name__ == "__main__":
         if buf[0] == "help":
             print("Commands:")
             print("  help                      Display this information.")
+            print("  list                      Display the list of services.")
             print("  status [name...]          Display service's status. If no argument is given, all services will be displayed.")
             print("  launch [name...]          Launch services. If no argument is given, all services will be launched.")
             print("  stop [name...]            Stop services. If no argument is given, all services will be stopped.")
@@ -126,19 +127,23 @@ if __name__ == "__main__":
         elif buf[0] == "launch":
             if len(buf) == 1:
                 launchAll(token)
+                print("All processes have been launched.")
             else:
                 for bf in buf[1:]:
                     try:
                         launchOne(token, plist.index(bf))
+                        print("Process {0} has been launched.".format(bf))
                     except:
                         print("Error: lib.{0} is not exist.".format(bf))
         elif buf[0] == "stop":
             if len(buf) == 1:
                 stopAll()
+                print("All processes have been stopped successfully.")
             else:
                 for bf in buf[1:]:
                     try:
                         stopOne(plist.index(bf))
+                        print("Process {0} has been stopped successfully.".format(bf))
                     except:
                         print("Error: lib.{0} is not exist.".format(bf))
                     
