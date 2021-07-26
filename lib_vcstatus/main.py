@@ -1,6 +1,7 @@
 import multiprocessing
 import sys
-# sys.path.append("..")  # .../discordbot/vcstatus で実行されたとき
+
+sys.path.append("..")  # .../discordbot/vcstatus で実行されたとき
 sys.path.append(".")  # .../discordbot で実行されたとき
 
 import os
@@ -18,7 +19,7 @@ intents: dc.Intents = dc.Intents.all()
 client: dc.Client = dc.Client(intents=intents)
 
 # get database file path
-filepath = os.path.dirname(__file__) + os.sep + vsDbName
+filepath = os.path.abspath(os.path.dirname(__file__)) + os.sep + vsDbName
 # connect database
 vcdata = SqliteAccessor(filepath)
 
@@ -167,5 +168,5 @@ def launch_vcstatus(token: str, activeFlag: multiprocessing.Value = None):
 
 # main ---
 if __name__ == "__main__":
-    with open("token.txt") as f:
+    with open("../token.txt") as f:
         launch_vcstatus(f.read())
