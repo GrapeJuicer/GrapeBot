@@ -144,6 +144,12 @@ async def sendErr(message: dc.Message):
     await message.channel.send(str)
 
 
+@client.event
+async def on_raw_message_delete(payload: dc.RawMessageDeleteEvent):
+    vcdata.execute("delete from {0} where guildid = {1} and channelid = {2} and msgid = {3}"\
+                    .format(vsTableName, payload.guild_id, payload.channel_id, payload.message_id))
+
+
 def launch_vcstatus(token: str, activeFlag: multiprocessing.Value = None):
     # set flag
     if not activeFlag == None:
