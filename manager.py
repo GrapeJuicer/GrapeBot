@@ -64,6 +64,17 @@ def launchOne(token: str, index: int) -> None:
         prcs[index].start()
 
 
+def stopAll() -> None:
+    for i in range(len(prcs)):
+        stopOne(i)
+
+
+def stopOne(index: int) -> None:
+    if isActiveProcess[index].value != pf.INACTIVE:
+        prcs[index].kill()
+        isActiveProcess[index].value = pf.INACTIVE
+
+
 # main
 if __name__ == "__main__":
     # get token
@@ -123,15 +134,11 @@ if __name__ == "__main__":
                         print("Error: lib.{0} is not exist.".format(bf))
         elif buf[0] == "stop":
             if len(buf) == 1:
-                for i in range(len(prcs)):
-                    if isActiveProcess[i].value != 0:
-                        prcs[i].terminate()
-                        isActiveProcess[i].value == 0
+                stopAll()
             else:
                 for bf in buf[1:]:
                     try:
-                        prcs[plist.index(bf)].terminate()
-                        print("Process {0} has stopped successfully.".format(bf))
+                        stopOne(plist.index(bf))
                     except:
                         print("Error: lib.{0} is not exist.".format(bf))
                     
