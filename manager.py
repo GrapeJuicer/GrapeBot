@@ -1,4 +1,5 @@
 import enum
+from lib_logger.main import launch_logger
 import multiprocessing as mp
 import threading as th
 import sys
@@ -6,11 +7,13 @@ import sys
 from time import sleep
 
 from lib_vcstatus.main import launch_vcstatus
+from lib_logger.main import launch_logger
 import processflag.pflag as pf
 
 # set process launchers
 libs = [
     launch_vcstatus, # voice chat status
+    launch_logger,
 ]
 
 # create array
