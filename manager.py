@@ -146,15 +146,6 @@ if __name__ == "__main__":
                         print("Process {0} has been stopped successfully.".format(bf))
                     except:
                         print("Error: lib.{0} is not exist.".format(bf))
-                    
-                    # another way
-                    # filtered processes
-                    # fps = list(filter(lambda x: infoToFuncName(x) == bf, prcs))
-                    # if fps: # if list is not empty
-                    #     fps[0].terminate()
-                    #     print("Process {0} has stopped successfully.".format(bf))
-                    # else:
-                    #     print("Error: lib.{0} is not exist.".format(bf))
         elif buf[0] == "exit":
             print("Exiting processes...")
             sys.exit(0)
