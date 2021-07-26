@@ -99,7 +99,8 @@ if __name__ == "__main__":
             buf = input("grapebot.console > ").split()
         except:
             print("\nExiting processes...")
-            sys.exit(1)
+            stopAll()
+            sys.exit(0)
 
         if buf[0] == "help":
             print("Commands:")
