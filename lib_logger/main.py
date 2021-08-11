@@ -166,6 +166,9 @@ def launch_logger(token: str, activeFlag: multiprocessing.Value = None):
         activeProcessFlag.value = pf.LAUNCHING
         flagMP = True
     
+    # create table
+    logdata.execute("create table if not exists {0} (guildid, channelid)".format(logTableName))
+    
     client.run(token)
     
     # set flag
