@@ -149,6 +149,7 @@ if __name__ == "__main__":
                         print("Error: lib.{0} is not exist.".format(bf))
         elif buf[0] == "exit":
             print("Exiting processes...")
+            stopAll()
             sys.exit(0)
         else:
             print("Error: Unknown command.")

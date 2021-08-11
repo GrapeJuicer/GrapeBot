@@ -51,7 +51,7 @@ async def on_ready():
 @client.event
 async def on_message(message: dc.Message):
     # do not anything if sender is this bot
-    if message.author == client.user:
+    if message.author == client.user or message.guild is None:
         return
     
     msg = message.content
@@ -103,7 +103,7 @@ async def messageProcess(message: dc.Message):
     #         return
     #     # disconnect
     #     await message.guild.voice_client.disconnect()
-    else:
+    elif messages[1] == "vcstatus":
         raise Exception("NonMatchException")
 
 
@@ -130,9 +130,13 @@ async def on_raw_reaction_add(payload: dc.RawReactionActionEvent):
     # remove reaction
     await message.remove_reaction(payload.emoji, payload.member)
     # create invate
-    inv: dc.Invite = await vc.getVcInvite(message, payload.emoji)
-    # send invite link
-    await payload.member.send("This is your invite link of voice channel:\nURL: %s" % inv.url)
+    try:
+        inv: dc.Invite = await vc.getVcInvite(message, payload.emoji)
+        # send invite link
+        await payload.member.send("This is your invite link of voice channel:\nURL: %s" % inv.url)
+    except:
+        # there's nothing to do at the moment.
+        pass
 
 
 # send error message to discord
