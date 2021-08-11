@@ -157,6 +157,7 @@ async def sendErr(message: dc.Message):
     await message.channel.send(str)
 
 
+# launcher
 def launch_logger(token: str, activeFlag: multiprocessing.Value = None):
     # set flag
     if not activeFlag == None:
