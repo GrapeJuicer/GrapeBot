@@ -77,7 +77,7 @@ async def messageProcess(message: dc.Message):
     # convert a space-separated string to a list
     messages: list = [i for i in message.content.split(" ") if i != ""]
     # check
-    if messages[1] == "vclist": # voice channel list
+    if messages[1:3] == ["vcstatus", "list"] and message.author.guild_permissions.administrator: # voice channel list
         # send message and get sended message object
         msg = await vc.sendVcStatus(message.channel)
         # add message id to database
