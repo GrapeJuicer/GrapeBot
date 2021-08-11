@@ -1,13 +1,16 @@
 import multiprocessing
 import sys
-
 sys.path.append("..")  # .../discordbot/lib_logger で実行されたとき
-sys.path.append(".")  # .../discordbot で実行されたとき
+sys.path.append(".")   # .../discordbot で実行されたとき
 
 import os
 import discord as dc
-# import lib_logger.logger as log
 import processflag.pflag as pf
+from sqlaccess.sqlaccess import SqliteAccessor
+from typing import Any, Literal, Union
+import datetime as dt
+import lib_logger.DBmanager as dm
+import lib_logger.logger as log
 
 
 vsDbName = "vcstatus.db"
