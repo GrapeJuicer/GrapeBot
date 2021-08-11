@@ -13,12 +13,18 @@ import lib_logger.DBmanager as dm
 import lib_logger.logger as log
 
 
-vsDbName = "vcstatus.db"
-vsTableName = "vcstatus"
+logDbName = "logger.db"
+logTableName = "logger"
 
 
 intents: dc.Intents = dc.Intents.all()
 client: dc.Client = dc.Client(intents=intents)
+
+
+# get database file path
+filepath = os.path.abspath(os.path.dirname(__file__)) + os.sep + logDbName
+# connect database
+logdata = SqliteAccessor(filepath)
 
 
 # multi-process var
