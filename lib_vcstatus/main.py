@@ -83,11 +83,11 @@ async def messageProcess(message: dc.Message):
         # add message id to database
         vc.addVcStatusMessageId(msg, vcdata, vsTableName)
 
-    elif messages[1] == "close" and "vcstatus" in messages[2:]:
-        if message.author.permissions_in(message.channel).administrator:
-            await message.channel.send("LOG: 'vcstatus' process was closed")
-            # print("'vcstatus' process was closed")
-            await client.close()
+    # elif messages[1:3] == ["vcstatus", "quit"]:
+    #     if message.author.permissions_in(message.channel).administrator:
+    #         await message.channel.send("LOG: 'vcstatus' process was closed")
+    #         # print("'vcstatus' process was closed")
+    #         await client.close()
 
     # elif (messages[1] == "join"):
     #     # check
