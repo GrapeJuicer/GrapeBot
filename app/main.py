@@ -1,27 +1,49 @@
+"""
+include packages
+"""
+
 from settings import *
 import sqlite3
 import discord
 from discord import app_commands
 import sys
 import signal
+import deepl
+from typing import Optional
 
-from lib import vote
+from lib import vote as vt
+from lib import deepl as dl
 
 
+
+"""
+Setup methods
+"""
 
 def setup():
     connection = sqlite3.connect(DATABASE)
-    vote.init(connection)
+    vt.init(connection)
     return connection
 
 
+
+"""
+Global variables
+"""
 
 connection: sqlite3.Connection = setup()
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client=client)
 
+with open(DEEPL_API_KEY) as f:
+    dl_translator = dl.LoggingTranslator(f.read(), connection=connection)
 
+
+
+"""
+Commands
+"""
 
 @tree.command(
     name='test',
@@ -65,16 +87,60 @@ async def test(ctx: discord.Interaction, message: str, hello: str):
 @app_commands.guild_only
 async def vote_with_any_choices(ctx: discord.Interaction, title: str, visible: str='Yes'):
     try:
-        await ctx.response.send_modal(vote.VoteModal(title=title, visible=visible))
+        await ctx.response.send_modal(vt.VoteModal(title=title, visible=visible))
     except Exception as e:
         print(e.with_traceback(sys.exc_info()[2]))
 
+
+
+@tree.command(
+    name='deepl',
+    description='DeepL翻訳を使用してテキストを翻訳する（default: Auto→JP）'
+)
+@app_commands.describe(
+    text='翻訳するテキスト',
+    source_language='翻訳前の言語（default: 自動検出）',
+    target_language='翻訳後の言語（default: 日本語）'
+)
+@app_commands.choices(
+    source_language=dl.DcLanguageList.SOURCE,
+    target_language=dl.DcLanguageList.TARGET
+)
+async def deepl_translate(ctx: discord.Interaction, text: str, source_language: Optional[str] = None, target_language: str = deepl.Language.JAPANESE):
+    try:
+        if source_language == "":
+            source_language = None
+
+        translated_text = dl_translator.translate_text(
+            ctx=ctx,
+            text=text,
+            source_lang=source_language,
+            target_lang=target_language
+        )
+
+        t = "> " + text.replace("\n", "\n> ") + "\n"
+
+        await ctx.response.send_message(t + translated_text.text)
+
+    except Exception as e:
+        print(e.with_traceback(sys.exc_info()[2]))
+
+
+
+"""
+Events
+"""
 
 @client.event
 async def on_ready():
     print('Bot is ready')
     await tree.sync()
 
+
+
+"""
+Cleanups
+"""
 
 def cleanup():
     global connection

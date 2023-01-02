@@ -132,3 +132,4 @@ dmypy.json
 *.org
 token.key
 .vscode/
+deepl.key
