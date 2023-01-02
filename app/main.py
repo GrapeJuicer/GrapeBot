@@ -17,25 +17,21 @@ from lib import deepl as dl
 
 
 """
-Setup methods
-"""
-
-def setup():
-    connection = sqlite3.connect(DATABASE)
-    vt.init(connection)
-    return connection
-
-
-
-"""
 Global variables
 """
 
-connection: sqlite3.Connection = setup()
-intents = discord.Intents.all()
-client = discord.Client(intents=intents)
-tree = app_commands.CommandTree(client=client)
+connection : sqlite3.Connection       = sqlite3.connect(DATABASE)
+intents    : discord.Intents          = discord.Intents.all()
+client     : discord.Client           = discord.Client(intents=intents)
+tree       : app_commands.CommandTree = app_commands.CommandTree(client=client)
 
+
+
+"""
+Setup
+"""
+
+vt.init(connection)
 with open(DEEPL_API_KEY) as f:
     dl_translator = dl.LoggingTranslator(f.read(), connection=connection)
 
