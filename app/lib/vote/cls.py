@@ -8,7 +8,16 @@ from datetime import datetime
 
 def init(connection: Connection):
     cur = connection.cursor()
-    cur.execute('create table if not exists gb_vote(id int primary key, date datetime not null, guild_id int not null, message_id int not null, user_id text not null, choice int not null)')
+    cur.execute(
+        'create table if not exists gb_vote(               \
+            id         integer  primary key autoincrement, \
+            date       datetime not null,                  \
+            guild_id   integer  not null,                  \
+            message_id integer  not null,                  \
+            user_id    text     not null,                  \
+            choice     integer  not null                   \
+        )'
+    )
     connection.commit()
     cur.close()
 
@@ -31,8 +40,7 @@ class VoteModal(Modal):
         self.visible = visible == 'Yes'
 
     async def on_submit(self, interaction: Interaction) -> None:
-        choices = [self.t1.value, self.t2.value,
-                   self.t3.value, self.t4.value, self.t5.value]
+        choices = [self.t1.value, self.t2.value, self.t3.value, self.t4.value, self.t5.value]
         choices = list(filter(lambda x: x != '', choices))
 
         desc = '\n'.join([
