@@ -6,7 +6,15 @@ from discord.utils import MISSING
 from sqlite3 import Connection
 from datetime import datetime
 
-def init(connection: Connection):
+
+connection: Connection = None
+
+
+def init(__connection: Connection):
+    global connection
+
+    connection = __connection
+
     cur = connection.cursor()
     cur.execute(
         'create table if not exists gb_vote(               \
@@ -56,7 +64,6 @@ class VoteModal(Modal):
 
 
         def checker(interaction: Interaction):
-            from main import connection
             cur = connection.cursor()
             cur.execute('select 0 from gb_vote where guild_id = ? and message_id = ? and user_id = ?', [interaction.guild.id, interaction.message.id, interaction.user.id])
             return len(cur.fetchall()) == 0
@@ -115,8 +122,6 @@ class VoteSelect(Select):
         )
 
     async def callback(self, interaction: Interaction):
-        from main import connection
-
         cur = connection.cursor()
         cur.execute('select 0 from gb_vote where guild_id = ? and message_id = ? and user_id = ?', [interaction.guild.id, interaction.message.reference.message_id, interaction.user.id])
         r = len(cur.fetchall()) == 0
@@ -180,7 +185,6 @@ class VoteEndButton(Button):
     async def callback(self, interaction: Interaction):
         # auth
         if interaction.user.guild_permissions.administrator or interaction.user.id == self.owner:
-            from main import connection
             cur = connection.cursor()
             cur.execute('select user_id, choice from gb_vote where guild_id = ? and message_id = ?', [interaction.guild.id, interaction.message.id])
             result = cur.fetchall()
